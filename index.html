@@ -100,7 +100,7 @@
 
   <section class="hero">
     <h1>Reklamsız IPTV ve<br>tüm platformlar tek yerde</h1>
-    <p>Kendi M3U listeni izle; Netflix, Disney+, HBO Max, Prime Video ve diğerlerini tek ekrandan aç. Android telefon ve Android TV için ücretsiz.</p>
+    <p>Kendi M3U listeni izle; Netflix, Disney+, HBO Max, Prime Video ve diğerlerini tek ekrandan aç. Android telefon, Android TV ve Windows için ücretsiz.</p>
     <div class="btns">
       <a class="btn" id="dl-phone" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
@@ -109,6 +109,10 @@
       <a class="btn alt" id="dl-tv" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
         Android TV için indir
+      </a>
+      <a class="btn alt" id="dl-pc" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
+        Windows için indir
       </a>
     </div>
     <div class="meta" id="meta">İçinde liste yok, kendi listeni girersin</div>
@@ -133,6 +137,16 @@
         <li>TV açılınca bir PIN gösterir; telefondan "TV'ye liste gönder" ile listeni yolla.</li>
       </ol>
       <div class="note">TV adresi: <span class="pill" id="short"></span></div>
+    </div>
+    <div class="card">
+      <h2>💻 Windows'a kurulum</h2>
+      <ol>
+        <li>Yukarıdaki <b>Windows için indir</b>'e bas.</li>
+        <li>İnen <code>clIPTVibe-windows.zip</code>'e sağ tıkla → <b>Tümünü ayıkla</b>.</li>
+        <li>Çıkan klasörde <b>clIPTVibe.exe</b>'ye çift tıkla.</li>
+        <li>"Windows bilgisayarınızı korudu" çıkarsa: <b>Ek bilgi</b> → <b>Yine de çalıştır</b>.</li>
+      </ol>
+      <div class="note">Kurulum gerekmez; klasörü istediğin yere koyabilirsin.</div>
     </div>
   </div>
 
@@ -159,6 +173,7 @@
   const tv = document.getElementById('dl-tv');
   phone.href = latest('clIPTVibe-telefon.apk');
   tv.href = latest('clIPTVibe-tv.apk');
+  document.getElementById('dl-pc').href = latest('clIPTVibe-windows.zip');
   // On a TV (Downloader, TV browsers) start on the TV button; a remote
   // needs a starting point, without jumping the page.
   const onTv = /\b(TV|AFT\w*|BRAVIA|SMART-?TV|Leanback|GoogleTV)\b/i.test(navigator.userAgent);
@@ -175,9 +190,13 @@
       const list = document.getElementById('versions');
       list.innerHTML = '';
       releases.filter((r) => !r.draft).forEach((r, i) => {
-        const apks = r.assets.filter((a) => a.name.endsWith('.apk'));
+        const apks = r.assets.filter((a) => /\.(apk|zip)$/.test(a.name));
         if (!apks.length) return;
-        const label = (a) => (/-tv\.apk$/.test(a.name) ? '📺 TV' : /-telefon\.apk$/.test(a.name) ? '📱 Telefon' : 'İndir');
+        const label = (a) =>
+          /-tv\.apk$/.test(a.name) ? '📺 TV'
+          : /-telefon\.apk$/.test(a.name) ? '📱 Telefon'
+          : /windows\.zip$/.test(a.name) ? '💻 Windows'
+          : 'İndir';
         if (i === 0) {
           document.getElementById('meta').innerHTML =
             `Son sürüm <code>${r.name || r.tag_name}</code> · ${fmtSize(apks[0].size)} · ${fmtDate(r.published_at)} · içinde liste yok, kendi listeni girersin`;
