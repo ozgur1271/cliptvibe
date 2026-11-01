@@ -49,6 +49,9 @@
     box-shadow: 0 10px 30px rgba(229,9,20,.35);
   }
   .btn:hover { background: #f6121d; }
+  .btns { display: flex; flex-wrap: wrap; gap: 14px; }
+  .btn.alt { background: transparent; border: 2px solid #fff; box-shadow: none; }
+  .btn.alt:hover { background: rgba(255,255,255,.08); }
   .btn:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
   .btn svg { width: 24px; height: 24px; }
   .meta { margin-top: 14px; color: var(--muted); font-size: 14px; }
@@ -76,6 +79,7 @@
   .versions li:first-child { border-top: 1px solid var(--line); }
   .versions .v { font-weight: 700; }
   .versions .d { color: var(--muted); font-size: 14px; }
+  .versions .links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .versions a { color: #fff; font-weight: 700; text-decoration: none; padding: 8px 14px; border-radius: 8px; background: var(--panel2); white-space: nowrap; }
   .versions a:hover { background: #333; }
   .latest-tag { margin-left: 8px; font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--accent); vertical-align: 2px; }
@@ -84,6 +88,7 @@
   @media (max-width: 560px) {
     .hero { padding: 32px 22px; }
     .btn { width: 100%; justify-content: center; }
+    .versions li { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
@@ -96,19 +101,25 @@
   <section class="hero">
     <h1>Reklamsız IPTV ve<br>tüm platformlar tek yerde</h1>
     <p>Kendi M3U listeni izle; Netflix, Disney+, HBO Max, Prime Video ve diğerlerini tek ekrandan aç. Android telefon ve Android TV için ücretsiz.</p>
-    <a class="btn" id="download" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
-      İndir (Android)
-    </a>
-    <div class="meta" id="meta">Telefon ve Android TV için tek dosya · içinde liste yok, kendi listeni girersin</div>
+    <div class="btns">
+      <a class="btn" id="dl-phone" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
+        Telefon için indir
+      </a>
+      <a class="btn alt" id="dl-tv" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
+        Android TV için indir
+      </a>
+    </div>
+    <div class="meta" id="meta">İçinde liste yok, kendi listeni girersin</div>
   </section>
 
   <div class="grid">
     <div class="card">
       <h2>📱 Telefona kurulum</h2>
       <ol>
-        <li>Yukarıdaki <b>İndir</b>'e bas.</li>
-        <li>İnen <code>clIPTVibe.apk</code> dosyasını aç.</li>
+        <li>Yukarıdaki <b>Telefon için indir</b>'e bas.</li>
+        <li>İnen <code>clIPTVibe-telefon.apk</code> dosyasını aç.</li>
         <li>İzin isterse "Bu kaynaktan izin ver"i aç, <b>Yükle</b>'ye bas.</li>
         <li>Uygulamayı aç, IPTV'ye girip kendi M3U bağlantını ekle.</li>
       </ol>
@@ -117,7 +128,7 @@
       <h2>📺 Android TV'ye kurulum</h2>
       <ol>
         <li><b>En kolayı:</b> telefondaki clIPTVibe'da sağ üstteki TV simgesi → "Bu uygulamayı TV'ye kur".</li>
-        <li>Ya da TV'de <b>Downloader</b> uygulamasını açıp bu sayfanın adresini yaz, <b>İndir</b>'e bas.</li>
+        <li>Ya da TV'de <b>Downloader</b> uygulamasını aç ve aşağıdaki <b>TV adresini</b> yaz; indirme kendiliğinden başlar.</li>
         <li>TV açılınca bir PIN gösterir; telefondan "TV'ye liste gönder" ile listeni yolla.</li>
       </ol>
       <div class="note">TV adresi: <span class="pill" id="short"></span></div>
@@ -142,13 +153,16 @@
   const owner = location.hostname.split('.')[0];
   const repo = location.pathname.split('/').filter(Boolean)[0] || 'cliptvibe';
   const base = `https://github.com/${owner}/${repo}/releases`;
-  const latest = `${base}/latest/download/clIPTVibe.apk`;
-
-  const dl = document.getElementById('download');
-  dl.href = latest;
-  // TV remotes need a starting point; don't jump the page there.
-  dl.focus({ preventScroll: true });
-  document.getElementById('short').textContent = `${location.host}${location.pathname}`.replace(/\/$/, '');
+  const latest = (file) => `${base}/latest/download/${file}`;
+  const phone = document.getElementById('dl-phone');
+  const tv = document.getElementById('dl-tv');
+  phone.href = latest('clIPTVibe-telefon.apk');
+  tv.href = latest('clIPTVibe-tv.apk');
+  // On a TV (Downloader, TV browsers) start on the TV button; a remote
+  // needs a starting point, without jumping the page.
+  const onTv = /\b(TV|AFT\w*|BRAVIA|SMART-?TV|Leanback|GoogleTV)\b/i.test(navigator.userAgent);
+  (onTv ? tv : phone).focus({ preventScroll: true });
+  document.getElementById('short').textContent = `${location.host}${location.pathname}`.replace(/\/$/, '') + '/tv';
 
   const fmtDate = (s) => new Date(s).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   const fmtSize = (n) => `${(n / 1048576).toFixed(0)} MB`;
@@ -159,18 +173,24 @@
       const list = document.getElementById('versions');
       list.innerHTML = '';
       releases.filter((r) => !r.draft).forEach((r, i) => {
-        const apk = r.assets.find((a) => a.name.endsWith('.apk'));
-        if (!apk) return;
+        const apks = r.assets.filter((a) => a.name.endsWith('.apk'));
+        if (!apks.length) return;
+        const label = (a) => (/-tv\.apk$/.test(a.name) ? '📺 TV' : /-telefon\.apk$/.test(a.name) ? '📱 Telefon' : 'İndir');
         if (i === 0) {
           document.getElementById('meta').innerHTML =
-            `Son sürüm <code>${r.name || r.tag_name}</code> · ${fmtSize(apk.size)} · ${fmtDate(r.published_at)} · telefon ve TV için tek dosya`;
+            `Son sürüm <code>${r.name || r.tag_name}</code> · ${fmtSize(apks[0].size)} · ${fmtDate(r.published_at)} · içinde liste yok, kendi listeni girersin`;
         }
         const li = document.createElement('li');
         li.innerHTML = `<div><span class="v"></span>${i === 0 ? '<span class="latest-tag">en yeni</span>' : ''}
-          <div class="d"></div></div><a>İndir · ${fmtSize(apk.size)}</a>`;
+          <div class="d"></div></div><div class="links"></div>`;
         li.querySelector('.v').textContent = r.name || r.tag_name;
         li.querySelector('.d').textContent = `${fmtDate(r.published_at)}${r.body ? ' — ' + r.body.split('\n')[0] : ''}`;
-        li.querySelector('a').href = apk.browser_download_url;
+        for (const a of apks) {
+          const link = document.createElement('a');
+          link.href = a.browser_download_url;
+          link.textContent = `${label(a)} · ${fmtSize(a.size)}`;
+          li.querySelector('.links').appendChild(link);
+        }
         list.appendChild(li);
       });
       if (!list.children.length) list.innerHTML = '<li><span class="d">Henüz sürüm yok.</span></li>';

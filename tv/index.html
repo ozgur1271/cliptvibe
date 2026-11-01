@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>clIPTVibe — TV</title>
+<style>body{background:#141414;color:#fff;font-family:sans-serif;padding:60px;font-size:28px}a{color:#fff}</style>
+</head>
+<body>
+<p>clIPTVibe TV sürümü indiriliyor…</p>
+<p>Başlamazsa <a id="go" href="#">buraya bas</a>.</p>
+<script>
+  // Short address for typing on a TV: goes straight to the TV download.
+  const owner = location.hostname.split('.')[0];
+  const repo = location.pathname.split('/').filter(Boolean)[0] || 'cliptvibe';
+  const url = `https://github.com/${owner}/${repo}/releases/latest/download/clIPTVibe-tv.apk`;
+  document.getElementById('go').href = url;
+  location.replace(url);
+</script>
+</body>
+</html>
