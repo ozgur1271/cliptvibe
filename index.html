@@ -112,6 +112,7 @@
       </a>
     </div>
     <div class="meta" id="meta">İçinde liste yok, kendi listeni girersin</div>
+    <div class="meta">Kısa adres: <code>tinyurl.com/cliptvibe</code></div>
   </section>
 
   <div class="grid">
@@ -162,7 +163,8 @@
   // needs a starting point, without jumping the page.
   const onTv = /\b(TV|AFT\w*|BRAVIA|SMART-?TV|Leanback|GoogleTV)\b/i.test(navigator.userAgent);
   (onTv ? tv : phone).focus({ preventScroll: true });
-  document.getElementById('short').textContent = `${location.host}${location.pathname}`.replace(/\/$/, '') + '/tv';
+  // Short links (TinyURL) to this page and to the TV download.
+  document.getElementById('short').textContent = 'tinyurl.com/cliptvibetv';
 
   const fmtDate = (s) => new Date(s).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   const fmtSize = (n) => `${(n / 1048576).toFixed(0)} MB`;
